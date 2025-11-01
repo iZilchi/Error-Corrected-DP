@@ -1,0 +1,8 @@
+{
+    "python.defaultInterpreterPath": "./venv/Scripts/python.exe",
+    "python.terminal.activateEnvironment": true,
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "black",
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "python.terminal.activateEnvironment": true
+}
