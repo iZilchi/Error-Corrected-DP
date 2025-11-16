@@ -1,0 +1,11 @@
+{
+    "python.pythonPath": "venv/bin/python",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.formatting.autopep8Path": "venv/bin/autopep8",
+    "python.formatting.blackPath": "venv/bin/black",
+    "python.formatting.yapfPath": "venv/bin/yapf",
+    "python.linting.banditPath": "venv/bin/bandit",
+    "python.linting.flake8Path": "venv/bin/flake8",
+    "python.linting.pylintPath": "venv/bin/pylint"
+}
