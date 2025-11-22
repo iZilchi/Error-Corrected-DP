@@ -1,29 +1,31 @@
-# models/mnist_cnn.py - UPDATED FOR SKIN CANCER
+# models/skin_cancer_cnn.py - NEW FILE
 import torch
 import torch.nn as nn
 
-class MNISTCNN(nn.Module):
+class SkinCancerCNN(nn.Module):
     """
-    Updated CNN model for Skin Cancer HAM10000
-    - 3 input channels (RGB) instead of 1
-    - 7 output classes (skin cancer types) instead of 10
+    CNN model for Skin Cancer HAM10000 classification
+    7 classes instead of 10, 3 input channels (RGB) instead of 1
     """
     def __init__(self):
-        super(MNISTCNN, self).__init__()
+        super(SkinCancerCNN, self).__init__()
         self.conv_layers = nn.Sequential(
-            nn.Conv2d(3, 32, 3, padding=1),  # CHANGED: 3 input channels for RGB
+            nn.Conv2d(3, 32, 3, padding=1),  # 3 input channels for RGB
             nn.ReLU(),
             nn.MaxPool2d(2),
             nn.Conv2d(32, 64, 3, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(2),
+            nn.Conv2d(64, 128, 3, padding=1),  # Extra layer for complexity
+            nn.ReLU(),
+            nn.MaxPool2d(2),
         )
         self.fc_layers = nn.Sequential(
-            nn.Dropout(0.25),
-            nn.Linear(64 * 7 * 7, 128),  # 28x28 -> 7x7 after 2 max pools
+            nn.Dropout(0.3),
+            nn.Linear(128 * 3 * 3, 256),  # Adjusted for 28x28 -> 3x3 after 3 max pools
             nn.ReLU(),
             nn.Dropout(0.5),
-            nn.Linear(128, 7)  # CHANGED: 7 classes for skin cancer
+            nn.Linear(256, 7)  # 7 classes for skin cancer
         )
 
     def forward(self, x):
@@ -44,3 +46,6 @@ class MNISTCNN(nn.Module):
         """For future use with gradient-based methods"""
         for param, grad in zip(self.parameters(), gradients):
             param.grad = grad.clone()
+
+# Alias for backward compatibility
+MNISTCNN = SkinCancerCNN

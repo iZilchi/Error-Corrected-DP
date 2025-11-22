@@ -1,4 +1,4 @@
-# experiments/run_comparison.py - UPDATED
+# experiments/run_comparison.py - UPDATED FOR SKIN CANCER
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -9,7 +9,10 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 from utils.data_loader import get_mnist_dataloaders
+
+# Use the updated MNISTCNN that handles 3 channels and 7 classes
 from models.mnist_cnn import MNISTCNN
+
 from core.federated_learning import FederatedLearningBase
 from core.differential_privacy import ErrorCorrectedDP
 
@@ -67,17 +70,20 @@ class ECDPFL(DPFL):
         return global_model
 
 def run_comprehensive_comparison():
-    """Run main comparison experiment - FOCUS ON MEANINGFUL PRIVACY"""
-    print("🎯 Running Comprehensive FL Comparison - STRONG PRIVACY FOCUS")
+    """Run main comparison experiment - UPDATED FOR SKIN CANCER"""
+    print("🎯 Running Comprehensive FL Comparison - SKIN CANCER DATASET")
+    print("📊 Dataset: HAM10000 (7 skin cancer types)")
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"🖥️  Using device: {device}")
+    
     client_loaders, test_loader = get_mnist_dataloaders(num_clients=3, batch_size=64)
     
-    # Use STRONG privacy settings that actually matter
+    # Use privacy settings for skin cancer
     methods = {
         'Standard FL': StandardFL(3, MNISTCNN, device),
-        'Basic DP-FL': DPFL(3, MNISTCNN, device, epsilon=0.5),  # Strong privacy
-        'EC-DP-FL': ECDPFL(3, MNISTCNN, device, epsilon=0.5)    # Strong privacy
+        'Basic DP-FL': DPFL(3, MNISTCNN, device, epsilon=0.5),
+        'EC-DP-FL': ECDPFL(3, MNISTCNN, device, epsilon=0.5)
     }
     
     results = {}
@@ -97,10 +103,6 @@ def run_comprehensive_comparison():
             times.append(round_time)
             print(f"Round {round+1}: {accuracy:.2f}% | {round_time:.2f}s")
             
-            # Don't early stop - we want to see full progression
-            # if accuracy > 90.0:  
-            #     break
-        
         results[name] = {'accuracies': accuracies, 'times': times}
     
     # Plot results
@@ -122,7 +124,7 @@ def plot_results(results):
     
     plt.xlabel('Federation Round')
     plt.ylabel('Accuracy (%)')
-    plt.title('Accuracy Progression (ε=0.5)')
+    plt.title('Skin Cancer Classification Accuracy (ε=0.5)')
     plt.legend()
     plt.grid(True, alpha=0.3)
     
@@ -142,13 +144,13 @@ def plot_results(results):
     plt.xticks(rotation=45)
     
     plt.tight_layout()
-    plt.savefig('results/comparison_results.png', dpi=300, bbox_inches='tight')
+    plt.savefig('results/skin_cancer_comparison.png', dpi=300, bbox_inches='tight')
     plt.show()
 
 def print_summary(results):
     """Print summary of results"""
     print("\n" + "="*60)
-    print("📊 COMPREHENSIVE COMPARISON SUMMARY (ε=0.5)")
+    print("📊 SKIN CANCER CLASSIFICATION SUMMARY (ε=0.5)")
     print("="*60)
     print(f"{'Method':<15} {'Final Accuracy':<15} {'Best Accuracy':<15} {'Avg Time':<10}")
     print("-"*60)
@@ -177,7 +179,8 @@ def print_summary(results):
         print(f"Basic DP-FL utility loss: {dp_drop:.2f}%")
         print(f"EC-DP-FL utility loss:    {ec_drop:.2f}%")
         print(f"EC-DP-FL improvement:     +{improvement:.2f}%")
-        print(f"Error correction recovers: {improvement/dp_drop*100:.1f}% of lost utility")
+        if dp_drop > 0:
+            print(f"Error correction recovers: {improvement/dp_drop*100:.1f}% of lost utility")
 
 if __name__ == "__main__":
     run_comprehensive_comparison()

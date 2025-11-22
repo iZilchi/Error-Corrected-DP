@@ -1,4 +1,4 @@
-# experiments/run_tradeoff_analysis.py - UPDATED
+# experiments/run_tradeoff_analysis.py - UPDATED FOR SKIN CANCER
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -8,7 +8,10 @@ import time
 import copy
 import matplotlib.pyplot as plt
 from utils.data_loader import get_mnist_dataloaders
+
+# Use the updated MNISTCNN that handles 3 channels and 7 classes
 from models.mnist_cnn import MNISTCNN
+
 from core.federated_learning import FederatedLearningBase
 from core.differential_privacy import ErrorCorrectedDP
 
@@ -16,15 +19,16 @@ from core.differential_privacy import ErrorCorrectedDP
 os.makedirs('results', exist_ok=True)
 
 class PrivacyTradeoffAnalyzer:
-    """Analyze privacy-utility tradeoff - FOCUS ON MEANINGFUL PRIVACY"""
+    """Analyze privacy-utility tradeoff - UPDATED FOR SKIN CANCER"""
     
     def __init__(self, num_clients=3):
         self.num_clients = num_clients
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print(f"🖥️  Using device: {self.device}")
         self.client_loaders, self.test_loader = get_mnist_dataloaders(num_clients=num_clients)
     
     def test_epsilon_range(self, epsilon_values, rounds=5, epochs_per_round=2):
-        """Test different epsilon values - MORE ROUNDS FOR BETTER LEARNING"""
+        """Test different epsilon values"""
         results = {'basic_dp': [], 'ec_dp': []}
         
         for epsilon in epsilon_values:
@@ -107,7 +111,7 @@ class PrivacyTradeoffAnalyzer:
         
         return accuracy
     
-    def plot_tradeoff(self, results, save_path='results/privacy_tradeoff.png'):
+    def plot_tradeoff(self, results, save_path='results/skin_cancer_privacy_tradeoff.png'):
         """Plot privacy-utility tradeoff results"""
         epsilons_basic = [r[0] for r in results['basic_dp']]
         accuracies_basic = [r[1] for r in results['basic_dp']]
@@ -121,7 +125,7 @@ class PrivacyTradeoffAnalyzer:
         
         plt.xlabel('Privacy Budget (ε) - Lower = More Private', fontsize=12)
         plt.ylabel('Accuracy (%)', fontsize=12)
-        plt.title('Privacy-Utility Tradeoff with Error Correction', fontsize=14)
+        plt.title('Skin Cancer: Privacy-Utility Tradeoff with Error Correction', fontsize=14)
         plt.legend(fontsize=12)
         plt.grid(True, alpha=0.3)
         
@@ -142,18 +146,19 @@ class PrivacyTradeoffAnalyzer:
         plt.show()
 
 def main():
-    """Run privacy-utility tradeoff analysis - FOCUS ON STRONG PRIVACY"""
-    print("🔍 Running Privacy-Utility Tradeoff Analysis - STRONG PRIVACY FOCUS")
+    """Run privacy-utility tradeoff analysis for skin cancer"""
+    print("🔍 Running Privacy-Utility Tradeoff Analysis - SKIN CANCER DATASET")
+    print("📊 Dataset: HAM10000 (7 skin cancer types)")
     
     analyzer = PrivacyTradeoffAnalyzer(num_clients=3)
     
-    # Test a range of epsilon values - focus on meaningful privacy (ε < 2.0)
+    # Test a range of epsilon values
     epsilon_values = [2.0, 1.0, 0.5, 0.3, 0.2, 0.1]
     results = analyzer.test_epsilon_range(epsilon_values, rounds=5, epochs_per_round=2)
     
     # Print results
     print("\n" + "="*60)
-    print("📈 PRIVACY-UTILITY TRADEOFF RESULTS")
+    print("📈 SKIN CANCER PRIVACY-UTILITY TRADEOFF RESULTS")
     print("="*60)
     print(f"{'ε':>8} {'Basic DP':>10} {'EC-DP':>10} {'Improvement':>12}")
     print("-"*60)
@@ -176,7 +181,7 @@ def main():
     
     # Plot results
     analyzer.plot_tradeoff(results)
-    print(f"\n✅ Plot saved to 'results/privacy_tradeoff.png'")
+    print(f"\n✅ Plot saved to 'results/skin_cancer_privacy_tradeoff.png'")
 
 if __name__ == "__main__":
     main()
